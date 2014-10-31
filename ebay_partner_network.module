@@ -89,8 +89,12 @@ function ebay_partner_network_theme($existing, $type, $theme, $path) {
   );
 }
 
+/**
+ * Returns a keyword to perform a search on eBay.
+ * @return string
+ */
 function ebay_partner_network_get_kw() {
-  $sku = '';
+  $kw = '';
 
   $menu_object = menu_get_object();
   if (!empty($menu_object->title)) {
