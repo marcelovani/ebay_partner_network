@@ -2,7 +2,6 @@
   Drupal.behaviors.ebay_partner_network = {
     attach: function (context, settings) {
       var conf = Drupal.settings.ebay_partner_network;
-      alert(conf.kw);
       var url = "http://svcs.ebay.com/services/search/FindingService/v1";
           url += "?OPERATION-NAME=findItemsAdvanced";
           url += "&SERVICE-VERSION=1.12.0";

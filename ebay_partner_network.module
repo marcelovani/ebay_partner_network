@@ -46,7 +46,7 @@ function ebay_partner_network_block_view($delta = '') {
 
   switch ($delta) {
     case 'pn_related_ebay_items':
-      $app_id = variable_get('ebay_partner_network_app_id');
+      $app_id = variable_get('ebay_partner_network_app_id', '');
       if(!empty($app_id)) {
         $settings = array(
           'app_id' => $app_id,
