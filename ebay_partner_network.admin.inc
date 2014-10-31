@@ -82,7 +82,7 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
   return system_settings_form($form);
 }
 
-function ebay_pn_get_categories($app_id) {
+function ebay_partner_network_get_categories($app_id) {
   $categories = array();
   $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid='.$app_id.'&siteid=3&CategoryID=-1&version=729&IncludeSelector=ChildCategories';
   $cat_list = file_get_contents($url);

@@ -9,7 +9,7 @@ function ebay_partner_network_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ebay_partner_network_admin_settings'),
     'access arguments' => array('administer ebay partner network settings'),
-    'file' => 'ebay_pn.admin.inc',
+    'file' => 'ebay_partner_network.admin.inc',
   );
   return $items;
 }
@@ -30,7 +30,7 @@ function ebay_partner_network_permission() {
  * Implements hook_block_info().
  */
 function ebay_partner_network_block_info() {
-  $blocks['ebay_partner_network_related_ebay_items'] = array(
+  $blocks['pn_related_ebay_items'] = array(
     'info' => t('Related ebay items.'),
     'cache' => DRUPAL_CACHE_PER_PAGE,
   );
@@ -45,7 +45,7 @@ function ebay_partner_network_block_view($delta = '') {
   $block = array();
 
   switch ($delta) {
-    case 'ebay_partner_network_related_ebay_items':
+    case 'pn_related_ebay_items':
       $app_id = variable_get('ebay_partner_network_app_id');
       if(!empty($app_id)) {
         $settings = array(
@@ -58,7 +58,7 @@ function ebay_partner_network_block_view($delta = '') {
           'default_category' => variable_get('ebay_partner_network_default_category', -1),
         );
 
-        $settings['kw'] = ebay_pn_get_kw();
+        $settings['kw'] = ebay_partner_network_get_kw();
 
         $block['content'] = array(
           '#theme' => array('ebay_partner_network_block'),
