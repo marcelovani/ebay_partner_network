@@ -1,0 +1,102 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function ebay_partner_network_menu() {
+  $items['admin/config/system/ebay_partner_network'] = array(
+    'title' => 'Ebay Integration Configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_partner_network_admin_settings'),
+    'access arguments' => array('administer ebay partner network settings'),
+    'file' => 'ebay_pn.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function ebay_partner_network_permission() {
+  return array(
+    'administer ebay partner network settings' => array(
+      'title' => t('Administer Ebay Partner Network Settings'),
+      'description' => t('Administer Ebay Partner Network Settings.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function ebay_partner_network_block_info() {
+  $blocks['ebay_partner_network_related_ebay_items'] = array(
+    'info' => t('Related ebay items.'),
+    'cache' => DRUPAL_CACHE_PER_PAGE,
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function ebay_partner_network_block_view($delta = '') {
+
+  $block = array();
+
+  switch ($delta) {
+    case 'ebay_partner_network_related_ebay_items':
+      $app_id = variable_get('ebay_partner_network_app_id');
+      if(!empty($app_id)) {
+        $settings = array(
+          'app_id' => $app_id,
+          'items_num' => variable_get('ebay_partner_network_items_num', 5),
+          'store_id' => variable_get('ebay_partner_network_store_id', 'EBAY-GB'),
+          'campaign_id' => variable_get('ebay_partner_network_campaign_id', ''),
+          'network_id' => variable_get('ebay_partner_network_network_id', 9),
+          'custom_id' => variable_get('ebay_partner_network_custom_id', ''),
+          'default_category' => variable_get('ebay_partner_network_default_category', -1),
+        );
+
+        $settings['kw'] = ebay_pn_get_kw();
+
+        $block['content'] = array(
+          '#theme' => array('ebay_partner_network_block'),
+          '#attached' => array(
+            'js' => array(
+               drupal_get_path('module', 'ebay_partner_network') . '/js/ebay.js',
+               array('data' => array('ebay_partner_network' => $settings), 'type' => 'setting'),
+            )
+          )
+        );
+        $block['subject'] = t('Related Ebay Items');
+      }
+      break;
+  }
+
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ebay_partner_network_theme($existing, $type, $theme, $path) {
+  return array(
+    'ebay_partner_network_block' => array(
+      'template' => 'ebay_partner_network_block',
+      'path' => drupal_get_path('module', 'ebay_partner_network') . '/theme',
+    ),
+  );
+}
+
+function ebay_partner_network_get_kw() {
+  $sku = '';
+
+  $menu_object = menu_get_object();
+  if (!empty($menu_object->title)) {
+    $kw = $menu_object->title;
+  }
+  drupal_alter('ebay_partner_network_keyword', $kw);
+
+  return $kw;
+}

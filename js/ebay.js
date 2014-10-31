@@ -1,7 +1,7 @@
 (function ($) {
-  Drupal.behaviors.ebay_pn = {
+  Drupal.behaviors.ebay_partner_network = {
     attach: function (context, settings) {
-      var conf = Drupal.settings.ebay_pn;
+      var conf = Drupal.settings.ebay_partner_network;
       alert(conf.kw);
       var url = "http://svcs.ebay.com/services/search/FindingService/v1";
           url += "?OPERATION-NAME=findItemsAdvanced";

@@ -1,4 +1,4 @@
 name = Ebay Partner Network
 description = Ebay Partnership Integration
-configure = admin/config/system/ebay_pn
+configure = admin/config/system/ebay_partner_network
 core = 7.x
