@@ -55,10 +55,10 @@ function ebay_partner_network_block_view($delta = '') {
           'campaign_id' => variable_get('ebay_partner_network_campaign_id', ''),
           'network_id' => variable_get('ebay_partner_network_network_id', 9),
           'custom_id' => variable_get('ebay_partner_network_custom_id', ''),
-          'default_category' => variable_get('ebay_partner_network_default_category', -1),
         );
 
-        $settings['kw'] = ebay_partner_network_get_kw();
+        $settings['keyword'] = ebay_partner_network_get_kw();
+        $settings['category'] = ebay_partner_network_get_category();
 
         $block['content'] = array(
           '#theme' => array('ebay_partner_network_block'),
@@ -103,4 +103,15 @@ function ebay_partner_network_get_kw() {
   drupal_alter('ebay_partner_network_keyword', $kw);
 
   return $kw;
+}
+
+/**
+ * Returns a category ID where eBay search will be performed.
+ * @return int
+ */
+function ebay_partner_network_get_category() {
+  $category = '';
+  drupal_alter('ebay_partner_network_category', $category);
+  $category = empty($category) ? variable_get('ebay_partner_network_default_category', -1) : $category;
+  return $category;
 }

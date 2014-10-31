@@ -10,8 +10,8 @@
           url += "&RESPONSE-DATA-FORMAT=JSON";
           url += "&callback=_cb_findItemsAdvanced";
           url += "&REST-PAYLOAD";
-          url += "&categoryId="+conf.default_category;  
-          url += "&keywords="+conf.kw; 
+          url += "&categoryId="+conf.category;  
+          url += "&keywords="+conf.keyword; 
           url += "&paginationInput.entriesPerPage="+conf.items_num;
           
           if(conf.campaign_id) {
@@ -34,23 +34,20 @@
 
 function _cb_findItemsAdvanced(root) {
    var items = root.findItemsAdvancedResponse[0].searchResult[0].item || [];
-   var html = [];
-   html.push('<table width="100%" border="0" cellspacing="0" cellpadding="4"><tbody>');
-    for (var i = 0; i < items.length; ++i) {
-      var item = Drupal.theme('ebayItemTheme', items[i]);
-      if(item) {
-        html.push(item);
-      }
-    }
-    html.push('</tbody></table>');
-    document.getElementById("ebay_items").innerHTML = html.join("");
+   var html = Drupal.theme('ebayItemsTheme', items);
+   document.getElementById("ebay_items").innerHTML = html.join("");
 }
 
-Drupal.theme.prototype.ebayItemTheme = function(item) {
-	console.log(item.sellingStatus[0].currentPrice[0]);
-  if (null != item.title && null != item.viewItemURL) {
-   return '<tr><td>' + '<img src="' + item.galleryURL + '" border="0">' + '</td>' +
-     '<td><a href="' + item.viewItemURL + '" target="_blank">' + item.title + '</a></td><td>'+parseFloat(item.sellingStatus[0].currentPrice[0].__value__).toFixed(2)+' '+item.sellingStatus[0].currentPrice[0]['@currencyId']+'</td>' +
-     '</tr>';
+Drupal.theme.prototype.ebayItemsTheme = function(items) {
+  var html = [];
+  html.push('<table width="100%" border="0" cellspacing="0" cellpadding="4"><tbody>');
+  for (var i = 0; i < items.length; ++i) {
+    if (null != items[i].title && null != items[i].viewItemURL) {
+      html.push('<tr><td>' + '<img src="' + items[i].galleryURL + '" border="0">' + '</td>');
+      html.push('<td><a href="' + items[i].viewItemURL + '" target="_blank">' + items[i].title + '</a></td><td>'+parseFloat(items[i].sellingStatus[0].currentPrice[0].__value__).toFixed(2)+' '+items[i].sellingStatus[0].currentPrice[0]['@currencyId']+'</td>');
+      html.push('</tr>');
+    }
   }
+  html.push('</tbody></table>');
+  return html;
 }
