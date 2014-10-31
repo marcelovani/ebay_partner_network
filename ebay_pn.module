@@ -1,0 +1,102 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function ebay_pn_menu() {
+  $items['admin/config/system/ebay_pn'] = array(
+    'title' => 'Ebay Integration Configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_pn_admin_settings'),
+    'access arguments' => array('administer ebay partner network settings'),
+    'file' => 'ebay_pn.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function ebay_pn_permission() {
+  return array(
+    'administer ebay partner network settings' => array(
+      'title' => t('Administer Ebay Partner Network Settings'),
+      'description' => t('Administer Ebay Partner Network Settings.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function ebay_pn_block_info() {
+  $blocks['ebay_pn_related_ebay_items'] = array(
+    'info' => t('Related ebay items.'),
+    'cache' => DRUPAL_CACHE_PER_PAGE,
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function ebay_pn_block_view($delta = '') {
+
+  $block = array();
+
+  switch ($delta) {
+    case 'ebay_pn_related_ebay_items':
+      $app_id = variable_get('ebay_pn_app_id');
+      if(!empty($app_id)) {
+        $settings = array(
+          'app_id' => $app_id,
+          'items_num' => variable_get('ebay_pn_items_num', 5),
+          'store_id' => variable_get('ebay_pn_store_id', 'EBAY-GB'),
+          'campaign_id' => variable_get('ebay_pn_campaign_id', ''),
+          'network_id' => variable_get('ebay_pn_network_id', 9),
+          'custom_id' => variable_get('ebay_pn_custom_id', ''),
+          'default_category' => variable_get('ebay_pn_default_category', -1),
+        );
+
+        $settings['kw'] = ebay_pn_get_kw();
+
+        $block['content'] = array(
+          '#theme' => array('ebay_pn_block'),
+          '#attached' => array(
+            'js' => array(
+               drupal_get_path('module', 'ebay_pn') . '/js/ebay.js',
+               array('data' => array('ebay_pn' => $settings), 'type' => 'setting'),
+            )
+          )
+        );
+        $block['subject'] = t('Related Ebay Items');
+      }
+      break;
+  }
+
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ebay_pn_theme($existing, $type, $theme, $path) {
+  return array(
+    'ebay_pn_block' => array(
+      'template' => 'ebay_pn_block',
+      'path' => drupal_get_path('module', 'ebay_pn') . '/theme',
+    ),
+  );
+}
+
+function ebay_pn_get_kw() {
+  $sku = '';
+
+  $menu_object = menu_get_object();
+  if (!empty($menu_object->title)) {
+    $kw = $menu_object->title;
+  }
+  drupal_alter('ebay_pn_keyword', $kw);
+
+  return $kw;
+}
