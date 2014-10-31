@@ -5,7 +5,7 @@
  */
 function ebay_partner_network_menu() {
   $items['admin/config/system/ebay_partner_network'] = array(
-    'title' => 'Ebay Integration Configuration',
+    'title' => 'Ebay Partner Network Configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ebay_partner_network_admin_settings'),
     'access arguments' => array('administer ebay partner network settings'),

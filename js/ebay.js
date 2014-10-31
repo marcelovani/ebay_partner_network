@@ -13,7 +13,6 @@
           url += "&categoryId="+conf.category;  
           url += "&keywords="+conf.keyword; 
           url += "&paginationInput.entriesPerPage="+conf.items_num;
-          
           if(conf.campaign_id) {
             url += "&affiliate.trackingId="+conf.campaign_id;
             if(conf.network_id) {
