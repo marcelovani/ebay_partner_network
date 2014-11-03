@@ -115,3 +115,78 @@ function ebay_partner_network_get_category() {
   $category = empty($category) ? variable_get('ebay_partner_network_default_category', -1) : $category;
   return $category;
 }
+
+function ebay_partner_network_get_categories($app_id) {
+  $categories = array();
+  $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid='.$app_id.'&siteid=3&CategoryID=-1&version=729&IncludeSelector=ChildCategories';
+  $cat_list = file_get_contents($url);
+  $xml = simplexml_load_string($cat_list);
+  if(!empty($xml->CategoryArray->Category)) {
+    foreach ($xml->CategoryArray->Category as $cat) {
+      $categories[(string)$cat->CategoryID] = (string)$cat->CategoryName;
+    }
+  }
+  return $categories;
+}
+
+function ebay_partner_network_options_list($field, $instance, $entity_type, $entity) {
+  $options = array();
+  $app_id = variable_get('ebay_partner_network_app_id','');
+  if(!empty($app_id)) {
+    $options = ebay_partner_network_get_categories($app_id);
+  }
+  return $options;
+}
+
+
+
+function ebay_partner_network_field_info() {
+  return array(
+    'ebay_category' => array(
+      'label' => t('Ebay Category'),
+      'description' => t('Ebay Category.'),
+      'settings' => array('max_length' => 255),
+      'instance_settings' => array(
+        'text_processing' => 0,
+      ),
+      'default_widget' => 'options_select',
+      'default_formatter' => 'states_field_options',
+    ),
+  );
+}
+
+
+
+function ebay_partner_network_field_widget_info_alter(&$info) {
+  $widgets = array(
+    'options_select' => array('ebay_category'),
+  );
+  foreach ($widgets as $widget => $field_types) {
+    $info[$widget]['field types'] = array_merge($info[$widget]['field types'], $field_types);
+  }
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function ebay_partner_network_field_is_empty($item, $field) {
+  return false;
+}
+
+/**
+ * Returns all fields which have a type of 'ebay_category'
+ */
+function ebay_partner_network_category_fields() {
+  $cache_bin = 'cache_field';
+  $cache_key = 'field_info:ebay_partner_categories';
+  if ($cache = cache_get($cache_key, $cache_bin)) {
+    $category_fields = $cache->data;
+  }
+  else {
+    $category_fields = field_read_fields(array('type' => 'ebay_category'));
+    if(!empty($category_fields)) {
+      cache_set($cache_key, $category_fields, $cache_bin);
+    }
+  }
+ return $category_fields;
+}
