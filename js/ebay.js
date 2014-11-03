@@ -10,8 +10,8 @@
           url += "&RESPONSE-DATA-FORMAT=JSON";
           url += "&callback=_cb_findItemsAdvanced";
           url += "&REST-PAYLOAD";
-          url += "&categoryId="+conf.category;  
-          url += "&keywords="+conf.keyword; 
+          url += "&categoryId="+conf.category;
+          url += "&keywords="+conf.keyword;
           url += "&paginationInput.entriesPerPage="+conf.items_num;
           if(conf.campaign_id) {
             url += "&affiliate.trackingId="+conf.campaign_id;
@@ -33,8 +33,13 @@
 
 function _cb_findItemsAdvanced(root) {
    var items = root.findItemsAdvancedResponse[0].searchResult[0].item || [];
-   var html = Drupal.theme('ebayItemsTheme', items);
-   document.getElementById("ebay_items").innerHTML = html.join("");
+   if(items.length > 0) {
+     var html = Drupal.theme('ebayItemsTheme', items);
+     document.getElementById("ebay_items").innerHTML = html.join("");
+   }
+   else {
+     document.getElementById("block-ebay-partner-network-pn-related-ebay-items").style.display = "none";
+   }
 }
 
 Drupal.theme.prototype.ebayItemsTheme = function(items) {
