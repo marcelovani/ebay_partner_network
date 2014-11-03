@@ -30,9 +30,14 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
     '#required' => TRUE,
   );
 
+  $ids = ebay_partner_network_site_ids();
+  $ids = array_keys($ids);
+  $ebay_site_names = array_combine($ids, $ids);
+
   $form['ebay_partner_network_store_id'] = array(
-    '#type' => 'textfield',
+    '#type' => 'select',
     '#title' => t('Ebay Store Id'),
+    '#options' => $ebay_site_names,
     '#description' => t('The ebay store ID'),
     '#default_value' => variable_get('ebay_partner_network_store_id', 'EBAY-GB'),
   );

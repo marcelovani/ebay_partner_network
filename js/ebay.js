@@ -36,6 +36,7 @@ function _cb_findItemsAdvanced(root) {
    if(items.length > 0) {
      var html = Drupal.theme('ebayItemsTheme', items);
      document.getElementById("ebay_items").innerHTML = html.join("");
+     document.getElementById("block-ebay-partner-network-pn-related-ebay-items").style.display = "block";
    }
    else {
      document.getElementById("block-ebay-partner-network-pn-related-ebay-items").style.display = "none";
