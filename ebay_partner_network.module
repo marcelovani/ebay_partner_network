@@ -59,6 +59,7 @@ function ebay_partner_network_block_view($delta = '') {
 
         $settings['keyword'] = ebay_partner_network_get_kw();
         $settings['category'] = ebay_partner_network_get_category();
+        $settings['custom_params'] = ebay_partner_network_get_custom_params();
 
         $block['content'] = array(
           '#theme' => array('ebay_partner_network_block'),
@@ -146,8 +147,9 @@ function ebay_partner_network_options_list($field, $instance, $entity_type, $ent
   return $options;
 }
 
-
-
+/**
+ * Implements hook_field_info().
+ */
 function ebay_partner_network_field_info() {
   return array(
     'ebay_category' => array(
@@ -163,8 +165,9 @@ function ebay_partner_network_field_info() {
   );
 }
 
-
-
+/**
+ * Implements hook_field_widget_info_alter().
+ */
 function ebay_partner_network_field_widget_info_alter(&$info) {
   $widgets = array(
     'options_select' => array('ebay_category'),
@@ -200,8 +203,7 @@ function ebay_partner_network_category_fields() {
 }
 
 /**
- * Returns site_id by name
- * @param unknown_type $site
+ * Returns site_id by name.
  */
 function ebay_partner_network_site_ids($site = null) {
   $sites = array(
@@ -229,4 +231,18 @@ function ebay_partner_network_site_ids($site = null) {
     'EBAY-SG' => 216
   );
   return (!empty($site) && !empty($sites[$site])) ? $sites[$site] : $sites;
+}
+
+/**
+ * Adding more params to the api request if needed.
+ */
+function ebay_partner_network_get_custom_params() {
+  $custom_params = $output = array();
+  drupal_alter('ebay_partner_network_custom_params', $custom_params);
+  if(!empty($custom_params)) {
+    foreach($custom_params as $k=>$v) {
+      $output[] = $k . '=' . $v;
+    }
+  }
+  return empty($output) ? '' : '&' . implode('&', $output);
 }

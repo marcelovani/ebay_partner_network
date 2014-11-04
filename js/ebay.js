@@ -22,6 +22,9 @@
               url += "&affiliate.customId="+conf.custom_id;
             }
           }
+          if(conf.custom_params){
+           url += conf.custom_params;
+          }
 
        s = document.createElement('script');
        s.src = url;
