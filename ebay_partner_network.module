@@ -237,12 +237,31 @@ function ebay_partner_network_site_ids($site = null) {
  * Adding more params to the api request if needed.
  */
 function ebay_partner_network_get_custom_params() {
-  $custom_params = $output = array();
+  $custom_params = '';
   drupal_alter('ebay_partner_network_custom_params', $custom_params);
+
   if(!empty($custom_params)) {
-    foreach($custom_params as $k=>$v) {
-      $output[] = $k . '=' . $v;
+    $custom_params = _ebay_partner_network_tree_walk($custom_params);
+  }
+
+  return $custom_params;
+}
+
+/**
+ * Recursive array walk to prepare an array for the api call.
+ */
+function _ebay_partner_network_tree_walk($array, $trail = '') {
+  foreach($array as $k=>$v) {
+    if(is_array($v)) {
+      foreach($v as $key=>$val) {
+         $trail = $k.'('.$key.')'.'.';
+         $output .= _ebay_partner_network_tree_walk($val, $trail);
+         $trail = '';
+      }
+    }
+    else {
+      $output .= '&'.$trail.$k.'='.$v;
     }
   }
-  return empty($output) ? '' : '&' . implode('&', $output);
+  return $output;
 }

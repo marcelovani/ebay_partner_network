@@ -37,16 +37,11 @@ function hook_ebay_partner_network_category_alter(&$category) {
 }
 
 /**
- * Adding more params to Ebay API call
+ * Adding more params to Ebay API call.
  * @param Array $custom_params
  */
 function hook_ebay_partner_network_custom_params_alter(&$custom_params) {
-  $custom_params['itemFilter(0).name'] = 'Condition';
-  $custom_params['itemFilter(0).value'] = 'New';
-  $custom_params['itemFilter(1).name'] = 'MaxPrice';
-  $custom_params['itemFilter(1).value'] = '500.00';
-  $custom_params['itemFilter(1).paramName'] = 'Currency';
-  $custom_params['itemFilter(1).paramValue'] = 'GBP';
-  $custom_params['itemFilter(2).name'] = 'ListingType';
-  $custom_params['itemFilter(2).value'] = 'FixedPrice';
+  $custom_params['itemFilter'][] = array('name' => 'Condition', 'value' => 'New');
+  $custom_params['itemFilter'][] = array('name' => 'ListingType', 'value' => 'FixedPrice');
+  $custom_params['itemFilter'][] = array('name' => 'MinPrice', 'value' => '500.00', 'paramName' => 'Currency', 'paramValue' => 'GBP');
 }
