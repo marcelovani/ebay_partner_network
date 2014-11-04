@@ -240,7 +240,7 @@ function ebay_partner_network_get_custom_params() {
   $custom_params = '';
   drupal_alter('ebay_partner_network_custom_params', $custom_params);
 
-  if(!empty($custom_params)) {
+  if(!empty($custom_params) && is_array($custom_params)) {
     $custom_params = _ebay_partner_network_tree_walk($custom_params);
   }
 
