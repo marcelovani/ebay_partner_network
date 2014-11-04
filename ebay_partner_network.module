@@ -122,12 +122,16 @@ function ebay_partner_network_get_category() {
  */
 function ebay_partner_network_get_categories($app_id) {
   $categories = array();
-  $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid='.$app_id.'&siteid=3&CategoryID=-1&version=729&IncludeSelector=ChildCategories';
-  $cat_list = file_get_contents($url);
-  $xml = simplexml_load_string($cat_list);
-  if(!empty($xml->CategoryArray->Category)) {
-    foreach ($xml->CategoryArray->Category as $cat) {
-      $categories[(string)$cat->CategoryID] = (string)$cat->CategoryName;
+  $site = variable_get('ebay_partner_network_store_id', 'EBAY-GB');
+  $site_id = ebay_partner_network_site_ids($site);
+  if(!empty($site_id)) {
+    $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid=' . $app_id . '&siteid=' . $site_id . '&CategoryID=-1&version=729&IncludeSelector=ChildCategories';
+    $cat_list = file_get_contents($url);
+    $xml = simplexml_load_string($cat_list);
+    if(!empty($xml->CategoryArray->Category)) {
+      foreach ($xml->CategoryArray->Category as $cat) {
+        $categories[(string)$cat->CategoryID] = (string)$cat->CategoryName;
+      }
     }
   }
   return $categories;
