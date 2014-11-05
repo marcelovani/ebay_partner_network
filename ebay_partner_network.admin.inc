@@ -50,12 +50,35 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
   );
 
   if(!empty($app_id)) {
+    $form['fieldset_category'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Ebay Category Settings'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
     $categories = ebay_partner_network_get_categories($app_id);
-    $form['ebay_partner_network_default_category'] = array(
+    $form['fieldset_category']['ebay_partner_network_default_category'] = array(
       '#type' => 'select',
       '#title' => t('Default Category'),
       '#options' => $categories,
       '#default_value' => variable_get('ebay_partner_network_default_category', ''),
+    );
+    $form['fieldset_category']['ebay_partner_network_category_depth'] = array(
+      '#type' => 'select',
+      '#title' => t('Category Depth'),
+      '#options' => range(0,6),
+      '#default_value' => variable_get('ebay_partner_network_category_depth', 0),
+    );
+    $form['fieldset_category']['ebay_partner_network_category_ids'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Categories which children will be loaded to the depth specified in "Category Depth" setting'),
+      '#description' => t('Comma separated list of IDs. E.g. 20081,625 will load all child categories of Antiques and Cameras & Photography to the depth specified in "Category Depth"'),
+      '#default_value' => variable_get('ebay_partner_network_category_ids', ''),
+    );
+    $form['fieldset_category']['ebay_partner_network_regenerate_category_tree'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Tick if you want to regenerate category tree (might take some time)'),
+      '#default_value' => FALSE,
     );
   }
 
@@ -83,6 +106,15 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
     '#description' => t('Custom ID'),
     '#default_value' => variable_get('ebay_partner_network_custom_id', ''),
   );
-
+  $form['#submit'][] = 'ebay_partner_network_admin_form_submit';
   return system_settings_form($form);
+}
+
+/**
+ * Custom 'ebay_partner_network_admin_settings' form submit callback.
+ */
+function ebay_partner_network_admin_form_submit($form, &$form_state) {
+  if($form_state['values']['ebay_partner_network_regenerate_category_tree']) {
+    ebay_partner_network_regenerate_ebay_category_tree();
+  }
 }

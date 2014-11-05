@@ -122,11 +122,22 @@ function ebay_partner_network_get_category() {
  * @param unknown_type $app_id
  */
 function ebay_partner_network_get_categories($app_id) {
-  $categories = array();
-  $site = variable_get('ebay_partner_network_store_id', 'EBAY-GB');
-  $site_id = ebay_partner_network_site_ids($site);
-  if(!empty($site_id)) {
-    $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid=' . $app_id . '&siteid=' . $site_id . '&CategoryID=-1&version=729&IncludeSelector=ChildCategories';
+  $cached = cache_get('ebay_partner_network:categories');
+  $categories = empty($cached->data) ? '' : $cached->data;
+
+  //loading the default category set
+  if(!$categories) {
+    $params = array();
+    $site = variable_get('ebay_partner_network_store_id', 'EBAY-GB');
+    $params['site_id'] = ebay_partner_network_site_ids($site);
+    $params['app_id'] = $app_id;
+    $params['max_depth'] = 0;
+    $params['ids'] = array();
+    $categories = ebay_partner_build_category_tree('-1', $params, $depth=0);
+  }
+  /*$categories = array();
+  if(!empty($params['site_id'])) {
+    $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid=' . $params['app_id'] . '&siteid=' . $params['site_id'] . '&CategoryID=-1&version=729&IncludeSelector=ChildCategories';
     $cat_list = file_get_contents($url);
     $xml = simplexml_load_string($cat_list);
     if(!empty($xml->CategoryArray->Category)) {
@@ -134,7 +145,7 @@ function ebay_partner_network_get_categories($app_id) {
         $categories[(string)$cat->CategoryID] = (string)$cat->CategoryName;
       }
     }
-  }
+  }*/
   return $categories;
 }
 
@@ -265,4 +276,55 @@ function _ebay_partner_network_tree_walk($array, $trail = '') {
     }
   }
   return $output;
+}
+
+function ebay_partner_build_category_tree($parent_id, $params, $depth=0, $go_deeper=false) {
+  //$site_id, $app_id,
+  //$ids = variable_get('') //array('1249', '58058', '625');
+
+  $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid=' . $params['app_id'] . '&siteid=' . $params['site_id'] . '&CategoryID=' . $parent_id . '&version=729&IncludeSelector=ChildCategories';
+  $cur_depth = $depth+1;
+  $cat_list = file_get_contents($url);
+  $xml = simplexml_load_string($cat_list);
+  if(!empty($xml->CategoryArray->Category)) {
+    foreach ($xml->CategoryArray->Category as $cat) {
+      if((string)$cat->CategoryLevel == $cur_depth) {
+        $cat_id = (string)$cat->CategoryID;
+        $categories[$cat_id] = str_repeat('-', ($cur_depth-1)*2) . (string)$cat->CategoryName;
+        if($cur_depth < $params['max_depth'] && (in_array($cat_id, $params['ids']) || $go_deeper)) {
+          $rec = ebay_partner_build_category_tree($cat_id, $params, $cur_depth, true);
+          if(is_array($rec) && !empty($rec)) {
+            $categories = $categories + $rec;
+          }
+        }
+      }
+    }
+  }
+  return $categories;
+}
+
+/**
+ * Rebuilds the cache for the category tree.
+ */
+function ebay_partner_network_regenerate_ebay_category_tree() {
+  $params = array();
+  $site = variable_get('ebay_partner_network_store_id', 'EBAY-GB');
+  $params['site_id'] = ebay_partner_network_site_ids($site);
+  $params['app_id'] = variable_get('ebay_partner_network_app_id', '');
+  $params['max_depth'] = variable_get('ebay_partner_network_category_depth', 0);
+  $ids = variable_get('ebay_partner_network_category_ids', '');
+
+  if(!empty($ids)) {
+    $params['ids'] = explode(',', $ids);
+  }
+
+  if(!empty($params['site_id'])) {
+    $categories = ebay_partner_build_category_tree('-1', $params, $depth=0);
+    if($categories) {
+      cache_set('ebay_partner_network:categories', $categories);
+      drupal_set_message('Categories were successfully generated');
+    } else {
+      drupal_set_message('There was an error while trying to generate categories', 'error');
+    }
+  }
 }
