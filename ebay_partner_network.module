@@ -135,17 +135,6 @@ function ebay_partner_network_get_categories($app_id) {
     $params['ids'] = array();
     $categories = ebay_partner_build_category_tree('-1', $params, $depth=0);
   }
-  /*$categories = array();
-  if(!empty($params['site_id'])) {
-    $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid=' . $params['app_id'] . '&siteid=' . $params['site_id'] . '&CategoryID=-1&version=729&IncludeSelector=ChildCategories';
-    $cat_list = file_get_contents($url);
-    $xml = simplexml_load_string($cat_list);
-    if(!empty($xml->CategoryArray->Category)) {
-      foreach ($xml->CategoryArray->Category as $cat) {
-        $categories[(string)$cat->CategoryID] = (string)$cat->CategoryName;
-      }
-    }
-  }*/
   return $categories;
 }
 
@@ -279,8 +268,6 @@ function _ebay_partner_network_tree_walk($array, $trail = '') {
 }
 
 function ebay_partner_build_category_tree($parent_id, $params, $depth=0, $go_deeper=false) {
-  //$site_id, $app_id,
-  //$ids = variable_get('') //array('1249', '58058', '625');
   $categories = array();
   $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid=' . $params['app_id'] . '&siteid=' . $params['site_id'] . '&CategoryID=' . $parent_id . '&version=729&IncludeSelector=ChildCategories';
   $cur_depth = $depth+1;
