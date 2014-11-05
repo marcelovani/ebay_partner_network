@@ -281,7 +281,7 @@ function _ebay_partner_network_tree_walk($array, $trail = '') {
 function ebay_partner_build_category_tree($parent_id, $params, $depth=0, $go_deeper=false) {
   //$site_id, $app_id,
   //$ids = variable_get('') //array('1249', '58058', '625');
-
+  $categories = array();
   $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid=' . $params['app_id'] . '&siteid=' . $params['site_id'] . '&CategoryID=' . $parent_id . '&version=729&IncludeSelector=ChildCategories';
   $cur_depth = $depth+1;
   $cat_list = file_get_contents($url);
@@ -291,10 +291,12 @@ function ebay_partner_build_category_tree($parent_id, $params, $depth=0, $go_dee
       if((string)$cat->CategoryLevel == $cur_depth) {
         $cat_id = (string)$cat->CategoryID;
         $categories[$cat_id] = str_repeat('-', ($cur_depth-1)*2) . (string)$cat->CategoryName;
-        if($cur_depth < $params['max_depth'] && (in_array($cat_id, $params['ids']) || $go_deeper)) {
-          $rec = ebay_partner_build_category_tree($cat_id, $params, $cur_depth, true);
-          if(is_array($rec) && !empty($rec)) {
-            $categories = $categories + $rec;
+        if(!empty($params['max_depth']) && !empty($params['ids'])) {
+          if($cur_depth < $params['max_depth'] && (in_array($cat_id, $params['ids']) || $go_deeper)) {
+            $rec = ebay_partner_build_category_tree($cat_id, $params, $cur_depth, true);
+            if(is_array($rec) && !empty($rec)) {
+              $categories = $categories + $rec;
+            }
           }
         }
       }
