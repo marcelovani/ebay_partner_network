@@ -251,6 +251,7 @@ function ebay_partner_network_get_custom_params() {
  * Recursive array walk to prepare an array for the api call.
  */
 function _ebay_partner_network_tree_walk($array, $trail = '') {
+  $output = '';
   foreach($array as $k=>$v) {
     if(is_array($v)) {
       foreach($v as $key=>$val) {
