@@ -106,7 +106,7 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
     '#description' => t('Custom ID'),
     '#default_value' => variable_get('ebay_partner_network_custom_id', ''),
   );
-  $form['#submit'][] = 'ebay_partner_network_admin_form_submit';
+
   return system_settings_form($form);
 }
 
@@ -116,5 +116,14 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
 function ebay_partner_network_admin_form_submit($form, &$form_state) {
   if($form_state['values']['ebay_partner_network_regenerate_category_tree']) {
     ebay_partner_network_regenerate_ebay_category_tree();
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function ebay_partner_network_form_alter(&$form, &$form_state, $form_id) {
+  if('ebay_partner_network_admin_settings' == $form_id) {
+    $form['#submit'][] = 'ebay_partner_network_admin_form_submit';
   }
 }
