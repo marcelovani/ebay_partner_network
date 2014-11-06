@@ -122,11 +122,11 @@ function ebay_partner_network_get_category() {
  * @param unknown_type $app_id
  */
 function ebay_partner_network_get_categories($app_id) {
-  $cached = cache_get('ebay_partner_network:categories');
-  $categories = empty($cached->data) ? '' : $cached->data;
+  
+  $categories = variable_get('ebay_partner_network_categories', '');
 
   //loading the default category set
-  if(!$categories) {
+  if(empty($categories)) {
     $params = array();
     $site = variable_get('ebay_partner_network_store_id', 'EBAY-GB');
     $params['site_id'] = ebay_partner_network_site_ids($site);
@@ -310,7 +310,7 @@ function ebay_partner_network_regenerate_ebay_category_tree() {
   if(!empty($params['site_id'])) {
     $categories = ebay_partner_build_category_tree('-1', $params, $depth=0);
     if($categories) {
-      cache_set('ebay_partner_network:categories', $categories);
+      variable_set('ebay_partner_network_categories', $categories);
       drupal_set_message('Categories were successfully generated');
     } else {
       drupal_set_message('There was an error while trying to generate categories', 'error');
