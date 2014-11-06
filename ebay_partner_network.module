@@ -55,6 +55,7 @@ function ebay_partner_network_block_view($delta = '') {
           'campaign_id' => variable_get('ebay_partner_network_campaign_id', ''),
           'network_id' => variable_get('ebay_partner_network_network_id', 9),
           'custom_id' => variable_get('ebay_partner_network_custom_id', ''),
+          'block_title' => variable_get('ebay_partner_network_block_title', ''),
         );
 
         $settings['keyword'] = ebay_partner_network_get_kw();
@@ -70,7 +71,6 @@ function ebay_partner_network_block_view($delta = '') {
             )
           )
         );
-        $block['subject'] = t('Related Ebay Items');
       }
       break;
   }

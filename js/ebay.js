@@ -47,8 +47,11 @@ function _cb_findItemsAdvanced(root) {
 }
 
 Drupal.theme.prototype.ebayItemsTheme = function(items) {
-  var html = [];
-  html.push('<table width="100%" border="0" cellspacing="0" cellpadding="4"><tbody>');
+  var conf = Drupal.settings.ebay_partner_network;
+  var html = [],
+      blockTitle = conf.block_title ? '<h3>' + conf.block_title + '</h3>' : '';
+
+  html.push(blockTitle + '<table width="100%" border="0" cellspacing="0" cellpadding="4"><tbody>');
   for (var i = 0; i < items.length; ++i) {
     if (null != items[i].title && null != items[i].viewItemURL) {
       html.push('<tr><td>' + '<img src="' + items[i].galleryURL + '" border="0">' + '</td>');

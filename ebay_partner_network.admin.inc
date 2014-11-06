@@ -42,14 +42,20 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
     '#default_value' => variable_get('ebay_partner_network_store_id', 'EBAY-GB'),
   );
 
+  $form['ebay_partner_network_block_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Block Title'),
+    '#default_value' => variable_get('ebay_partner_network_block_title', ''),
+  );
+
   $form['ebay_partner_network_items_num'] = array(
     '#type' => 'select',
     '#title' => t('Number Of Items to be displayed'),
-    '#options' => range(0,50),
+    '#options' => range(0, 50),
     '#default_value' => variable_get('ebay_partner_network_items_num', 5),
   );
 
-  if(!empty($app_id)) {
+  if (!empty($app_id)) {
     $form['fieldset_category'] = array(
       '#type' => 'fieldset',
       '#title' => t('Ebay Category Settings'),
