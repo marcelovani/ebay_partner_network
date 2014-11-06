@@ -63,10 +63,11 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
       '#options' => $categories,
       '#default_value' => variable_get('ebay_partner_network_default_category', ''),
     );
+    $depth_values = range(1,6);
     $form['fieldset_category']['ebay_partner_network_category_depth'] = array(
       '#type' => 'select',
       '#title' => t('Category Depth'),
-      '#options' => range(1,6),
+      '#options' => array_combine($depth_values, $depth_values),
       '#default_value' => variable_get('ebay_partner_network_category_depth', 1),
     );
     $form['fieldset_category']['ebay_partner_network_category_ids'] = array(
