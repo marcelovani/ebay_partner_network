@@ -300,7 +300,7 @@ function ebay_partner_network_regenerate_ebay_category_tree() {
   $site = variable_get('ebay_partner_network_store_id', 'EBAY-GB');
   $params['site_id'] = ebay_partner_network_site_ids($site);
   $params['app_id'] = variable_get('ebay_partner_network_app_id', '');
-  $params['max_depth'] = variable_get('ebay_partner_network_category_depth', 0);
+  $params['max_depth'] = variable_get('ebay_partner_network_category_depth', 1);
   $ids = variable_get('ebay_partner_network_category_ids', '');
 
   if(!empty($ids)) {

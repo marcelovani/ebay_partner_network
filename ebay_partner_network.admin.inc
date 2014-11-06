@@ -66,8 +66,8 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
     $form['fieldset_category']['ebay_partner_network_category_depth'] = array(
       '#type' => 'select',
       '#title' => t('Category Depth'),
-      '#options' => range(0,6),
-      '#default_value' => variable_get('ebay_partner_network_category_depth', 0),
+      '#options' => range(1,6),
+      '#default_value' => variable_get('ebay_partner_network_category_depth', 1),
     );
     $form['fieldset_category']['ebay_partner_network_category_ids'] = array(
       '#type' => 'textfield',
@@ -106,8 +106,12 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
     '#description' => t('Custom ID'),
     '#default_value' => variable_get('ebay_partner_network_custom_id', ''),
   );
-
-  return system_settings_form($form);
+  
+  $form = system_settings_form($form);
+  // Add our own submit callback last in the queue.
+  $form['#submit'][] = 'ebay_partner_network_admin_form_submit';
+  
+  return $form;
 }
 
 /**
@@ -116,14 +120,5 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
 function ebay_partner_network_admin_form_submit($form, &$form_state) {
   if($form_state['values']['ebay_partner_network_regenerate_category_tree']) {
     ebay_partner_network_regenerate_ebay_category_tree();
-  }
-}
-
-/**
- * Implements hook_form_alter().
- */
-function ebay_partner_network_form_alter(&$form, &$form_state, $form_id) {
-  if('ebay_partner_network_admin_settings' == $form_id) {
-    $form['#submit'][] = 'ebay_partner_network_admin_form_submit';
   }
 }
