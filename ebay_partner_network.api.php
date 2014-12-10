@@ -41,6 +41,7 @@ function hook_ebay_partner_network_category_alter(&$category) {
 
 /**
  * Adding more params to Ebay API call.
+ * More info about available filters: http://developer.ebay.com/Devzone/finding/CallRef/findItemsAdvanced.html
  * @param Array $custom_params
  */
 function hook_ebay_partner_network_custom_params_alter(&$custom_params) {
