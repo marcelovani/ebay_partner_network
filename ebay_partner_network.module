@@ -127,7 +127,7 @@ function ebay_partner_network_get_category() {
       }
     }
   }
-  // letting other modules a way to modify the category
+  // letting other modules to modify the category
   drupal_alter('ebay_partner_network_category', $category);
   // fallback. If category hasn't been set, then we will use the default one
   $category = empty($category) ? variable_get('ebay_partner_network_default_category', -1) : $category;
