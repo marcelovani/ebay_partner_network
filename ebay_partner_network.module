@@ -112,7 +112,24 @@ function ebay_partner_network_get_kw() {
  */
 function ebay_partner_network_get_category() {
   $category = '';
+  // getting all fields of the 'ebay_category' type
+  $ebay_category_fields = ebay_partner_network_category_fields();
+  if(sizeof($ebay_category_fields) > 0) {
+    //checking if ebay category is set on the node
+    $menu_object = menu_get_object();
+    foreach(array_keys($ebay_category_fields) as $cat) {
+      if (!empty($menu_object->$cat)) {
+        if(!empty($menu_object->{$cat}[LANGUAGE_NONE][0]['option'])) {
+          //overriding category if the value was found
+          $category = $menu_object->{$cat}[LANGUAGE_NONE][0]['option'];
+          break;
+        }
+      }
+    }
+  }
+  // letting other modules a way to modify the category
   drupal_alter('ebay_partner_network_category', $category);
+  // fallback. If category hasn't been set, then we will use the default one
   $category = empty($category) ? variable_get('ebay_partner_network_default_category', -1) : $category;
   return $category;
 }
@@ -188,6 +205,7 @@ function ebay_partner_network_field_is_empty($item, $field) {
  * Returns all fields which have a type of 'ebay_category'
  */
 function ebay_partner_network_category_fields() {
+  $category_fields = array();
   $cache_bin = 'cache_field';
   $cache_key = 'field_info:ebay_partner_categories';
   if ($cache = cache_get($cache_key, $cache_bin)) {
@@ -267,6 +285,9 @@ function _ebay_partner_network_tree_walk($array, $trail = '') {
   return $output;
 }
 
+/**
+ * Recursively genereates a tree of ebay categories.
+ */
 function ebay_partner_build_category_tree($parent_id, $params, $depth=0, $go_deeper=false) {
   $categories = array();
   $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid=' . $params['app_id'] . '&siteid=' . $params['site_id'] . '&CategoryID=' . $parent_id . '&version=729&IncludeSelector=ChildCategories';
