@@ -86,7 +86,7 @@ function ebay_partner_network_theme($existing, $type, $theme, $path) {
     'ebay_partner_network_block' => array(
       'template' => 'ebay_partner_network_block',
       'path' => drupal_get_path('module', 'ebay_partner_network') . '/theme',
-      'arguments' => array('vars' => NULL),
+      'render element' => 'element',
     ),
   );
 }
