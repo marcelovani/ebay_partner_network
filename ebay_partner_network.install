@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Installation and uninstallation functions.
+ */
 
 /**
  * Implements hook_field_schema().
@@ -8,21 +12,7 @@ function ebay_partner_network_field_schema($field) {
   $schema['columns']['option'] = array(
     'type' => 'varchar',
     'length' => 25,
-    'not null' => FALSE
+    'not null' => FALSE,
   );
   return $schema;
-}
-
-/**
- * Implements hook_install().
- */
-function ebay_partner_network_install() {
-
-}
-
-/**
- * Implements hook_uninstall().
- */
-function ebay_partner_network_uninstall() {
-
 }

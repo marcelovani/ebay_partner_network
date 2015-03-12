@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Ebay Partner Network Module.
+ */
 
 /**
  * Implements hook_menu().
@@ -47,7 +51,7 @@ function ebay_partner_network_block_view($delta = '') {
   switch ($delta) {
     case 'pn_related_ebay_items':
       $app_id = variable_get('ebay_partner_network_app_id', '');
-      if(!empty($app_id)) {
+      if (!empty($app_id)) {
         $settings = array(
           'app_id' => $app_id,
           'items_num' => variable_get('ebay_partner_network_items_num', 5),
@@ -66,10 +70,10 @@ function ebay_partner_network_block_view($delta = '') {
           '#theme' => array('ebay_partner_network_block'),
           '#attached' => array(
             'js' => array(
-               drupal_get_path('module', 'ebay_partner_network') . '/js/ebay.js',
-               array('data' => array('ebay_partner_network' => $settings), 'type' => 'setting'),
-            )
-          )
+              drupal_get_path('module', 'ebay_partner_network') . '/js/ebay.js',
+              array('data' => array('ebay_partner_network' => $settings), 'type' => 'setting'),
+            ),
+          ),
         );
       }
       break;
@@ -93,7 +97,9 @@ function ebay_partner_network_theme($existing, $type, $theme, $path) {
 
 /**
  * Returns a keyword to perform a search on eBay.
+ *
  * @return string
+ *   keyword.
  */
 function ebay_partner_network_get_kw() {
   $kw = '';
@@ -109,57 +115,64 @@ function ebay_partner_network_get_kw() {
 
 /**
  * Returns a category ID where eBay search will be performed.
- * @return int
+ *
+ * @return int 
+ *   Category ID.
  */
 function ebay_partner_network_get_category() {
   $category = '';
-  // getting all fields of the 'ebay_category' type
+  // Getting all fields of the 'ebay_category' type.
   $ebay_category_fields = ebay_partner_network_category_fields();
-  if(sizeof($ebay_category_fields) > 0) {
-    //checking if ebay category is set on the node
+  if (count($ebay_category_fields) > 0) {
+    // Checking if ebay category is set on the node.
     $menu_object = menu_get_object();
-    foreach(array_keys($ebay_category_fields) as $cat) {
+    foreach (array_keys($ebay_category_fields) as $cat) {
       if (!empty($menu_object->$cat)) {
-        if(!empty($menu_object->{$cat}[LANGUAGE_NONE][0]['option'])) {
-          //overriding category if the value was found
+        if (!empty($menu_object->{$cat}[LANGUAGE_NONE][0]['option'])) {
+          // Overriding category if the value was found.
           $category = $menu_object->{$cat}[LANGUAGE_NONE][0]['option'];
           break;
         }
       }
     }
   }
-  // letting other modules to modify the category
+  // Letting other modules to modify the category.
   drupal_alter('ebay_partner_network_category', $category);
-  // fallback. If category hasn't been set, then we will use the default one
+  // Fallback. If category hasn't been set, then we will use the default one.
   $category = empty($category) ? variable_get('ebay_partner_network_default_category', -1) : $category;
   return $category;
 }
 
 /**
- * Get Category List from Ebay
- * @param unknown_type $app_id
+ * Get Category List from Ebay.
+ *
+ * @param string $app_id
+ *   Ebay Application ID.
  */
 function ebay_partner_network_get_categories($app_id) {
-  
+
   $categories = variable_get('ebay_partner_network_categories', '');
 
-  //loading the default category set
-  if(empty($categories)) {
+  // Loading the default category set.
+  if (empty($categories)) {
     $params = array();
     $site = variable_get('ebay_partner_network_store_id', 'EBAY-GB');
     $params['site_id'] = ebay_partner_network_site_ids($site);
     $params['app_id'] = $app_id;
     $params['max_depth'] = 0;
     $params['ids'] = array();
-    $categories = ebay_partner_build_category_tree('-1', $params, $depth=0);
+    $categories = ebay_partner_build_category_tree('-1', $params, $depth = 0);
   }
   return $categories;
 }
 
+/**
+ * Helper function to get a list of Ebay categories.
+ */
 function ebay_partner_network_options_list($field, $instance, $entity_type, $entity) {
   $options = array();
-  $app_id = variable_get('ebay_partner_network_app_id','');
-  if(!empty($app_id)) {
+  $app_id = variable_get('ebay_partner_network_app_id', '');
+  if (!empty($app_id)) {
     $options = ebay_partner_network_get_categories($app_id);
   }
   return $options;
@@ -199,11 +212,11 @@ function ebay_partner_network_field_widget_info_alter(&$info) {
  * Implements hook_field_is_empty().
  */
 function ebay_partner_network_field_is_empty($item, $field) {
-  return false;
+  return FALSE;
 }
 
 /**
- * Returns all fields which have a type of 'ebay_category'
+ * Returns all fields which have a type of 'ebay_category'.
  */
 function ebay_partner_network_category_fields() {
   $category_fields = array();
@@ -214,17 +227,17 @@ function ebay_partner_network_category_fields() {
   }
   else {
     $category_fields = field_read_fields(array('type' => 'ebay_category'));
-    if(!empty($category_fields)) {
+    if (!empty($category_fields)) {
       cache_set($cache_key, $category_fields, $cache_bin);
     }
   }
- return $category_fields;
+  return $category_fields;
 }
 
 /**
  * Returns site_id by name.
  */
-function ebay_partner_network_site_ids($site = null) {
+function ebay_partner_network_site_ids($site = NULL) {
   $sites = array(
     'EBAY-US' => 0,
     'EBAY-ENCA' => 2,
@@ -247,7 +260,7 @@ function ebay_partner_network_site_ids($site = null) {
     'EBAY-FRCA' => 210,
     'EBAY-PH' => 211,
     'EBAY-PL' => 212,
-    'EBAY-SG' => 216
+    'EBAY-SG' => 216,
   );
   return (!empty($site) && !empty($sites[$site])) ? $sites[$site] : $sites;
 }
@@ -259,7 +272,7 @@ function ebay_partner_network_get_custom_params() {
   $custom_params = '';
   drupal_alter('ebay_partner_network_custom_params', $custom_params);
 
-  if(!empty($custom_params) && is_array($custom_params)) {
+  if (!empty($custom_params) && is_array($custom_params)) {
     $custom_params = _ebay_partner_network_tree_walk($custom_params);
   }
 
@@ -271,16 +284,16 @@ function ebay_partner_network_get_custom_params() {
  */
 function _ebay_partner_network_tree_walk($array, $trail = '') {
   $output = '';
-  foreach($array as $k=>$v) {
-    if(is_array($v)) {
-      foreach($v as $key=>$val) {
-         $trail = $k.'('.$key.')'.'.';
-         $output .= _ebay_partner_network_tree_walk($val, $trail);
-         $trail = '';
+  foreach ($array as $k => $v) {
+    if (is_array($v)) {
+      foreach ($v as $key => $val) {
+        $trail = $k . '(' . $key . ').';
+        $output .= _ebay_partner_network_tree_walk($val, $trail);
+        $trail = '';
       }
     }
     else {
-      $output .= '&'.$trail.$k.'='.$v;
+      $output .= '&' . $trail . $k . '=' . $v;
     }
   }
   return $output;
@@ -289,21 +302,21 @@ function _ebay_partner_network_tree_walk($array, $trail = '') {
 /**
  * Recursively genereates a tree of ebay categories.
  */
-function ebay_partner_build_category_tree($parent_id, $params, $depth=0, $go_deeper=false) {
+function ebay_partner_build_category_tree($parent_id, $params, $depth = 0, $go_deeper = FALSE) {
   $categories = array();
   $url = 'http://open.api.ebay.com/Shopping?callname=GetCategoryInfo&appid=' . $params['app_id'] . '&siteid=' . $params['site_id'] . '&CategoryID=' . $parent_id . '&version=729&IncludeSelector=ChildCategories';
-  $cur_depth = $depth+1;
+  $cur_depth = $depth + 1;
   $cat_list = file_get_contents($url);
   $xml = simplexml_load_string($cat_list);
-  if(!empty($xml->CategoryArray->Category)) {
+  if (!empty($xml->CategoryArray->Category)) {
     foreach ($xml->CategoryArray->Category as $cat) {
-      if((string)$cat->CategoryLevel == $cur_depth) {
-        $cat_id = (string)$cat->CategoryID;
-        $categories[$cat_id] = str_repeat('-', ($cur_depth-1)*2) . (string)$cat->CategoryName;
-        if(!empty($params['max_depth']) && !empty($params['ids'])) {
-          if($cur_depth < $params['max_depth'] && (in_array($cat_id, $params['ids']) || $go_deeper)) {
-            $rec = ebay_partner_build_category_tree($cat_id, $params, $cur_depth, true);
-            if(is_array($rec) && !empty($rec)) {
+      if ((string) $cat->CategoryLevel == $cur_depth) {
+        $cat_id = (string) $cat->CategoryID;
+        $categories[$cat_id] = str_repeat('-', ($cur_depth - 1) * 2) . (string) $cat->CategoryName;
+        if (!empty($params['max_depth']) && !empty($params['ids'])) {
+          if ($cur_depth < $params['max_depth'] && (in_array($cat_id, $params['ids']) || $go_deeper)) {
+            $rec = ebay_partner_build_category_tree($cat_id, $params, $cur_depth, TRUE);
+            if (is_array($rec) && !empty($rec)) {
               $categories = $categories + $rec;
             }
           }
@@ -325,16 +338,17 @@ function ebay_partner_network_regenerate_ebay_category_tree() {
   $params['max_depth'] = variable_get('ebay_partner_network_category_depth', 1);
   $ids = variable_get('ebay_partner_network_category_ids', '');
 
-  if(!empty($ids)) {
+  if (!empty($ids)) {
     $params['ids'] = explode(',', $ids);
   }
 
-  if(!empty($params['site_id'])) {
-    $categories = ebay_partner_build_category_tree('-1', $params, $depth=0);
-    if($categories) {
+  if (!empty($params['site_id'])) {
+    $categories = ebay_partner_build_category_tree('-1', $params, $depth = 0);
+    if ($categories) {
       variable_set('ebay_partner_network_categories', $categories);
       drupal_set_message('Categories were successfully generated');
-    } else {
+    }
+    else {
       drupal_set_message('There was an error while trying to generate categories', 'error');
     }
   }

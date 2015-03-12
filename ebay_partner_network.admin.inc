@@ -20,7 +20,7 @@
  *   Output of the system_settings_form()
  */
 function ebay_partner_network_admin_settings($form, &$form_state) {
-  $app_id = variable_get('ebay_partner_network_app_id','');
+  $app_id = variable_get('ebay_partner_network_app_id', '');
 
   $form['ebay_partner_network_app_id'] = array(
     '#type' => 'textfield',
@@ -69,7 +69,7 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
       '#options' => $categories,
       '#default_value' => variable_get('ebay_partner_network_default_category', ''),
     );
-    $depth_values = range(1,6);
+    $depth_values = range(1, 6);
     $form['fieldset_category']['ebay_partner_network_category_depth'] = array(
       '#type' => 'select',
       '#title' => t('Category Depth'),
@@ -113,11 +113,11 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
     '#description' => t('Custom ID'),
     '#default_value' => variable_get('ebay_partner_network_custom_id', ''),
   );
-  
+
   $form = system_settings_form($form);
   // Add our own submit callback last in the queue.
   $form['#submit'][] = 'ebay_partner_network_admin_form_submit';
-  
+
   return $form;
 }
 
@@ -125,7 +125,7 @@ function ebay_partner_network_admin_settings($form, &$form_state) {
  * Custom 'ebay_partner_network_admin_settings' form submit callback.
  */
 function ebay_partner_network_admin_form_submit($form, &$form_state) {
-  if($form_state['values']['ebay_partner_network_regenerate_category_tree']) {
+  if ($form_state['values']['ebay_partner_network_regenerate_category_tree']) {
     ebay_partner_network_regenerate_ebay_category_tree();
   }
 }
